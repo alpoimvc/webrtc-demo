@@ -36,33 +36,40 @@ const callButton = document.getElementById('callButton');
 const callInput = document.getElementById('callInput');
 const answerButton = document.getElementById('answerButton');
 const remoteVideo = document.getElementById('remoteVideo');
-const hangupButton = document.getElementById('hangupButton');
+//const hangupButton = document.getElementById('hangupButton');
 
 // 1. Setup media sources
 
 webcamButton.onclick = async () => {
   // AR session
-  localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
-  remoteStream = new MediaStream();
+  //localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+  navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+    .then(function (stream) {
+      console.log("got media stream successfully: ", stream);
+      localStream = stream;
+      remoteStream = new MediaStream();
+      // Push tracks from local stream to peer connection
+      localStream.getTracks().forEach((track) => {
+        pc.addTrack(track, localStream);
+      });
 
-  // Push tracks from local stream to peer connection
-  localStream.getTracks().forEach((track) => {
-    pc.addTrack(track, localStream);
-  });
+      // Pull tracks from remote stream, add to video stream
+      pc.ontrack = (event) => {
+        event.streams[0].getTracks().forEach((track) => {
+          remoteStream.addTrack(track);
+        });
+      };
 
-  // Pull tracks from remote stream, add to video stream
-  pc.ontrack = (event) => {
-    event.streams[0].getTracks().forEach((track) => {
-      remoteStream.addTrack(track);
+      webcamVideo.srcObject = localStream;
+      remoteVideo.srcObject = remoteStream;
+
+      callButton.disabled = false;
+      answerButton.disabled = false;
+      webcamButton.disabled = true;
+    })
+    .catch(function (err) {
+      console.log("error getting media device stream: ", err);
     });
-  };
-
-  webcamVideo.srcObject = localStream;
-  remoteVideo.srcObject = remoteStream;
-
-  callButton.disabled = false;
-  answerButton.disabled = false;
-  webcamButton.disabled = true;
 };
 
 // 2. Create an offer
@@ -112,7 +119,7 @@ callButton.onclick = async () => {
     });
   });
 
-  hangupButton.disabled = false;
+  //hangupButton.disabled = false;
 };
 
 // 3. Answer the call with the unique ID
