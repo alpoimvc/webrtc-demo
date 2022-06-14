@@ -1,8 +1,8 @@
 # webrtc-demo
 
-##Usage
+#Usage
 
-git clone <this-repo>
+git clone "this-repo"
 npm install
 
 npm run dev
