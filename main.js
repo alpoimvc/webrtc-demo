@@ -42,8 +42,8 @@ const remoteVideo = document.getElementById('remoteVideo');
 
 webcamButton.onclick = async () => {
   // AR session
-  //localStream = await navigator.mediaDevices.getUserMedia({video: {'mandatory': {'chromeMediaSource':'screen'}}, audio: true });
-  navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+  //localStream = await navigator.mediaDevices.getUserMedia({video: true, audio: true });
+  navigator.mediaDevices.getUserMedia({ video: {'mandatory': {'chromeMediaSource':'screen'}}, audio: true })
     .then(function (stream) {
       console.log("got media stream successfully: ", stream);
       localStream = stream;
